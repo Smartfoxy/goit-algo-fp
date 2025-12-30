@@ -1,5 +1,7 @@
 import random
 
+from matplotlib import pyplot as plt
+
 
 def simulate_dice_rolls(n):
     results = {i: 0 for i in range(2, 13)}
@@ -55,11 +57,35 @@ def show_comparison_table(results, n, analytic_probs):
     print("{:<5} {:>9} {:>11.2f}% {:>11.2f}% {:>11.2f}%".format("Total", total_count, total_mc, total_an, total_diff / 11))
 
 
+def show_probability_chart(results: dict[int, int], n: int, analytic_probs: dict[int, float]) -> None:
+    sums = list(range(2, 13))
+    mc_probs = [(results[s] / n) * 100 for s in sums]
+    an_probs = [analytic_probs[s] * 100 for s in sums]
+
+    x = range(len(sums))
+    width = 0.4
+
+    plt.figure(figsize=(10, 6))
+    plt.bar(x, mc_probs, width=width, label="Monte-Carlo", align="center")
+    plt.bar([i + width for i in x], an_probs, width=width, label="Analytic", align="center")
+
+    plt.xticks([i + width / 2 for i in x], sums)
+    plt.xlabel("Sum of dice")
+    plt.ylabel("Probability (%)")
+    plt.title(f"Monte-Carlo vs Analytic probabilities (n={n})")
+    plt.legend()
+    plt.grid(axis="y", alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+
 def experiment(ns):
     analytic_probs = get_analytic_probabilities()
     for n in ns:
         results, n = simulate_dice_rolls(n)
         show_comparison_table(results, n, analytic_probs)
+        show_probability_chart(results, n, analytic_probs)
 
 
 
