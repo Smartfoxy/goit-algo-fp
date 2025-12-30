@@ -5,6 +5,16 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 
+def main():
+    heap = [3,7,10,15,8,22]
+
+    root = heap_to_tree_min(heap)
+    draw_tree(root)
+
+    root = heap_to_tree_max(heap)
+    draw_tree(root)
+
+
 class Node:
   
     def __init__(self, key, color="skyblue"):
@@ -72,11 +82,7 @@ def heap_to_nodes(heap, i=0):
 
 
 
-heap = [3,7,10,15,8,22]
+if __name__ == "__main__":
+    main()
 
-# root = heap_to_tree_min(heap)
-# draw_tree(root)
-
-root = heap_to_tree_max(heap)
-draw_tree(root)
 
