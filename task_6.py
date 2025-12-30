@@ -62,50 +62,49 @@ def get_max_calories(products, budget, memo):
 def dynamic_programming_bottom_up(products: dict, budget: int):
     product_list = get_product_list(products)
     sorted_products = sorted(product_list, key=lambda d: d["cost"])
-    p= len(products)
-    # K = [[0 for p in range(budget + 1)] for i in range(p + 1)]
-    K = [[(0, []) for p in range(budget + 1)] for i in range(p + 1)]
+    p= len(sorted_products)
+    K = [[(0, []) for _ in range(budget + 1)] for _ in range(p + 1)]
 
     for i in range(1, p + 1):
+        current_product = sorted_products[i-1]
+        cost = current_product["cost"]
+        calories = current_product["calories"]
+
         for j in range(1, budget + 1):
-            current_product = sorted_products[i-1]
-            cost = current_product["cost"]
             if cost > j:
                 K[i][j] = K[i-1][j]
             else:
-                # print(f'else [{i}-{j}]' , j, '-',  sorted_products[i-1]["cost"])
-                if K[i-1][j-cost][0] + current_product["calories"] > K[i-1][j][0]:
-                    # K[i][j] = K[i-1][j-cost] + current_product["calories"]
-                    new_cal = K[i-1][j-cost][0] + current_product["calories"]
-                    new_list = K[i-1][j-cost][1] + [current_product]
-                    K[i][j] = (new_cal, new_list)
+                without = K[i-1][j]
+                with_cal = K[i-1][j-cost][0] + calories
+                with_list = K[i-1][j-cost][1] + [current_product]
 
-                    
+                if with_cal > without[0]:
+                    K[i][j] = (with_cal, with_list)
                 else:
-                    K[i][j] = K[i-1][j]
+                    K[i][j] = without
 
-                # K[i][j] = max(K[i-1][j-cost] + sorted_products[i-1]["calories"], K[i-1][j])
-                # result.append()
-
-    # for i in range(budget+2):
-    #     if i == 0:
-    #         print(f"{'Product':<10}", end="")
-    #     else:
-    #         print(f"{i-1:<4}", end="")
-    # print()        
-    # for i in range(p+1):
-    #     for j in range(budget + 2):
-    #         if j == 0:
-    #             if i == 0:
-    #                 print(f"{"0":<10}", end="")
-    #             else:
-    #                 print(f"{sorted_products[i-1]["name"]:<10}", end="")
-    #         else:
-    #             print(f"{K[i][j-1][0]:<4}", end="")
-    #     print()
+    # show_k_table(budget, p, sorted_products, K)
     
     return K[p][budget][1]
 
+
+def show_k_table(budget, p, products, K):
+    for i in range(budget+2):
+        if i == 0:
+            print(f"{'Product':<10}", end="")
+        else:
+            print(f"{i-1:<4}", end="")
+    print()        
+    for i in range(p+1):
+        for j in range(budget + 2):
+            if j == 0:
+                if i == 0:
+                    print(f"{'0':<10}", end="")
+                else:
+                    print(f"{products[i-1]['name']:<10}", end="")
+            else:
+                print(f"{K[i][j-1][0]:<4}", end="")
+        print()
 
 
 items = {
@@ -123,24 +122,18 @@ def show_result(name, result):
     print(f"With total calories: {sum(item['calories'] for item in result)}")
 
 
+
 budget = 100
 
 result = greedy_algorithm(items, budget)
 show_result("greedy_algorithm", result)
-# print("greedy_algorithm: ")
-# print(f"Next products were picked up: {', '.join(item['name'] for item in result)}")
-# print(f"With total calories: {sum(item['calories'] for item in result)}")
 
 print('-'*100)
 result = dynamic_programming_up_bottom(items, budget)
 show_result("dynamic_algorithm_up_bottom", result)
-# print("dynamic_algorithm_up_bottom: ")
-# print(f"Next products were picked up: {', '.join(item['name'] for item in result)}")
-# print(f"With total calories: {sum(item['calories'] for item in result)}")
+
 
 print('-'*100)
 result = dynamic_programming_bottom_up(items, budget)
 show_result("dynamic_algorithm_bottom_up", result)
-# print("dynamic_algorithm_bottom_up: ")
-# print(f"Next products were picked up: {', '.join(item['name'] for item in result[1])}")
-# print(f"With total calories: {result[0]}")
+
